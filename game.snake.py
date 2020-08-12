@@ -144,16 +144,22 @@ def close():
 def main():
   global should_quit, game_over, game_close, game_quit_screen_wait
 
+  # Main game loop
   while not game_over:
+    # Close loop
     while game_close == True:
       close()
     loop()
 
+  # Trigger direct quit
   if should_quit == True:
-    print("Exit from game!!!")
+    print("Exit game!!!")
+    print("Exit game!!!")
+    print("Exit game!!!")
+    print("Exit game!!!")
     quit()
 
-  # 'Game Over' Screen
+  # 'Game Over' screen
   message("Finish", red)
 
   # Update the screen
