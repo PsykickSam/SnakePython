@@ -9,6 +9,7 @@ pygame.init()
 # Colors
 white = (255, 255, 255)
 black = (0, 0, 0)
+gray = (128, 128, 128)
 blue = (0, 0, 255)
 red = (255, 0, 0)
 yellow = (255, 255, 102)
@@ -38,7 +39,7 @@ font_style = pygame.font.SysFont(None, font_size)
 # scrore_font = pygame.font.SysFont("comicsansms", font_size)
 # Game
 display = pygame.display.set_mode((display_width, display_height))
-game_quit_screen_wait = 2
+game_quit_screen_wait = 1
 game_over = False
 game_close = False
 should_quit = False
@@ -54,10 +55,13 @@ def quit():
   quit()
 
 def snake(snake_list):
-  global display, snake_block_size
+  global display, snake_block_size, black, gray
 
-  for body in snake_list:
-    pygame.draw.rect(display, black, [int(body[0]), int(body[1]), snake_block_size, snake_block_size])
+  for index, body in enumerate(snake_list, 1):
+    if index == len(snake_list):
+      pygame.draw.rect(display, gray, [int(body[0]), int(body[1]), snake_block_size, snake_block_size])
+    else:
+      pygame.draw.rect(display, black, [int(body[0]), int(body[1]), snake_block_size, snake_block_size])
 
 def reset():
   global game_over, game_close, x1, y1, foodx, foody, snake_list, snake_length
