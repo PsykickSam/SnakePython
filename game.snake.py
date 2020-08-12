@@ -154,6 +154,9 @@ def main():
   # Trigger direct quit
   if should_quit == True:
     print("Game Exit!!!")
+    print("Game Exit!!!")
+    print("Game Exit!!!")
+    print("Game Exit!!!")
     quit()
 
   # 'Game Over' screen
