@@ -9,5 +9,7 @@ A snake game build with Python (PyGame). Basic Snake game created for learning p
 ```
 python game.snake.py
 ```
+## Next
+  - Class Based Coding
 
 #### SadmanDMCX - &copy; - 2020
