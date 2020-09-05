@@ -1,219 +1,216 @@
 import time
 import pygame
 import random
+import math
 
-# Initialize
-pygame.init()
+class Game():
+  def __init__(self):
+    pygame.init()
 
-# Game Variables
-# Colors
-white = (255, 255, 255)
-black = (0, 0, 0)
-gray = (128, 128, 128)
-blue = (0, 0, 255)
-red = (255, 0, 0)
-yellow = (255, 255, 102)
-green = (50, 153, 213)
-# Clock
-clock = pygame.time.Clock()
-# Snake
-snake_block_size = 20
-snake_speed = 20
-snake_list = []
-snake_length = 1
-# Food
-food_block_size = 20
-# Positions
-display_width = 800
-display_height = 600
-x1 = display_width / 2
-y1 = display_height / 2
-x1_change = 0
-y1_change = 0
-foodx = round(random.randrange(0, display_width - snake_block_size) / 10.00) * 10.00
-foody = round(random.randrange(0, display_height - snake_block_size) / 10.00) * 10.00
-# Font
-font_size = 30
-font_size_factor = 10 # Factor: 30 -> 10, 60 -> 20, 50 -> 16.5 [(Centralization) Divisible of 3 (Normalize Float with {}.5)]
-font_style = pygame.font.SysFont(None, font_size)
-# scrore_font = pygame.font.SysFont("comicsansms", font_size)
-# Game
-display = pygame.display.set_mode((display_width, display_height))
-game_quit_screen_wait = 1
-game_over = False
-game_close = False
-should_quit = False
-score = 0
+    # Colors
+    self.white = (255, 255, 255)
+    self.black = (0, 0, 0)
+    self.gray = (128, 128, 128)
+    self.blue = (0, 0, 255)
+    self.red = (255, 0, 0)
+    self.yellow = (255, 255, 102)
+    self.green = (50, 153, 213)
+    # Clock
+    self.clock = pygame.time.Clock()
+    # Snake
+    self.snake_block_size = 20
+    self.snake_speed = 20
+    self.snake_list = []
+    self.snake_length = 1
+    # Food
+    self.food_block_size = 20
+    # Positions
+    self.display_width = 800
+    self.display_height = 600
+    self.x1 = self.display_width / 2
+    self.y1 = self.display_height / 2
+    self.x1_change = 0
+    self.y1_change = 0
+    self.foodx = round(random.randrange(0, self.display_width - self.snake_block_size) / 10.00) * 10.00
+    self.foody = round(random.randrange(0, self.display_height - self.snake_block_size) / 10.00) * 10.00
+    # Font
+    self.font_size = 30
+    self.font_size_factor = 10 # Factor: 30 -> 10, 60 -> 20, 50 -> 16.5 [(Centralization) Divisible of 3 (Normalize Float with {}.5)]
+    self.font_style = pygame.font.SysFont("Sans", self.font_size)
+    # scrore_font = pygame.font.SysFont("comicsansms", font_size)
+    # Game
+    self.display = pygame.display.set_mode((self.display_width, self.display_height))
+    self.game_quit_screen_wait = 1
+    self.game_over = False
+    self.game_close = False
+    self.should_quit = False
+    self.score = 0
 
-# Init
-pygame.display.update()
-pygame.display.set_caption('Snake')
+  def quit(self):
+    pygame.quit()
 
-# Functions
-def quit():
-  pygame.quit()
-  quit()
+  def snake(self, snake_list):
+    for index, body in enumerate(snake_list, 1):
+      if index == len(snake_list):
+        pygame.draw.rect(self.display, self.gray, [int(body[0]), int(body[1]), self.snake_block_size, self.snake_block_size])
+      else:
+        pygame.draw.rect(self.display, self.black, [int(body[0]), int(body[1]), self.snake_block_size, self.snake_block_size])
 
-def snake(snake_list):
-  global display, snake_block_size, black, gray
+  def reset(self):
+    print("Resetting all the data")
+    self.score = 0
+    self.game_over = False
+    self.game_close = False
+    self.x1 = self.display_width / 2
+    self.y1 = self.display_height / 2
+    self.snake_list = []
+    self.snake_length = 1
+    self.foodx = round(random.randrange(0, self.display_width - self.snake_block_size) / 10.00) * 10.00
+    self.foody = round(random.randrange(0, self.display_height - self.snake_block_size) / 10.00) * 10.00
 
-  for index, body in enumerate(snake_list, 1):
-    if index == len(snake_list):
-      pygame.draw.rect(display, gray, [int(body[0]), int(body[1]), snake_block_size, snake_block_size])
-    else:
-      pygame.draw.rect(display, black, [int(body[0]), int(body[1]), snake_block_size, snake_block_size])
+  def message(self, msg, color, top_placement = 50):
+    halfLengthOfMsg = int(math.floor(len(msg) / 2))
+    renderedMessage = self.font_style.render(msg, True, color)
+    self.display.blit(renderedMessage, [int((self.display_width / 2) - (halfLengthOfMsg * self.font_size_factor)), top_placement])
 
-def reset():
-  global game_over, game_close, x1, y1, foodx, foody, snake_list, snake_length
+  def loop(self):
+    if self.game_over == True:
+      return
 
-  score = 0
-  game_over = False
-  game_close = False
-  x1 = display_width / 2
-  y1 = display_height / 2
-  snake_list = []
-  snake_length = 1
-  foodx = round(random.randrange(0, display_width - snake_block_size) / 10.00) * 10.00
-  foody = round(random.randrange(0, display_height - snake_block_size) / 10.00) * 10.00
+    for event in pygame.event.get():
+      if event.type == pygame.QUIT:
+        self.game_over = True
+        self.should_quit = True
+      if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_RIGHT:
+          print("Snake moves: RIGHT")
+          self.x1_change = self.snake_block_size
+          self.y1_change = 0
+        elif event.key == pygame.K_LEFT:
+          print("Snake moves: LEFT")
+          self.x1_change = -self.snake_block_size
+          self.y1_change = 0
+        elif event.key == pygame.K_UP:
+          print("Snake moves: UP")
+          self.x1_change = 0
+          self.y1_change = -self.snake_block_size
+        elif event.key == pygame.K_DOWN:
+          print("Snake moves: DOWN")
+          self.x1_change = 0
+          self.y1_change = self.snake_block_size
 
-def message(msg, color, top_placement = 50):
-  global font_style, display_width, display_height
+    # Check for wall collition
+    if self.x1 >= self.display_width or self.x1 < 0 or self.y1 >= self.display_height or self.y1 < 0:
+      print("Snake collide with the wall")
+      self.game_close = True
 
-  halfLengthOfMsg = int(len(msg) / 2)
-  renderedMessage = font_style.render(msg, True, color)
-  display.blit(renderedMessage, [int((display_width / 2) - (halfLengthOfMsg * font_size_factor)), top_placement])
+    # Update the position of the snake
+    self.x1 += self.x1_change
+    self.y1 += self.y1_change
 
-def loop():
-  global x1, x1_change, y1, y1_change, foodx, foody, snake_speed, \
-    game_over, game_close, should_quit, snake_length, score
+    # Fill the display with white background
+    self.display.fill(self.white)
 
-  if game_over == True:
-    return
+    # Draw food in the screen
+    pygame.draw.rect(self.display, self.green, [int(self.foodx), int(self.foody), self.food_block_size, self.food_block_size])
 
-  for event in pygame.event.get():
-    if event.type == pygame.QUIT:
-      game_over = True
-      should_quit = True
-    if event.type == pygame.KEYDOWN:
-      if event.key == pygame.K_RIGHT:
-        print("Snake moves: RIGHT")
-        x1_change = snake_block_size
-        y1_change = 0
-      elif event.key == pygame.K_LEFT:
-        print("Snake moves: LEFT")
-        x1_change = -snake_block_size
-        y1_change = 0
-      elif event.key == pygame.K_UP:
-        print("Snake moves: UP")
-        x1_change = 0
-        y1_change = -snake_block_size
-      elif event.key == pygame.K_DOWN:
-        print("Snake moves: DOWN")
-        x1_change = 0
-        y1_change = snake_block_size
+    # Draw snake in the screen
+    snake_head = []
+    snake_head.append(self.x1)
+    snake_head.append(self.y1)
+    self.snake_list.append(snake_head)
+    if len(self.snake_list) > self.snake_length:
+      del self.snake_list[0]
 
-  # Check for wall collition
-  if x1 >= display_width or x1 < 0 or y1 >= display_height or y1 < 0:
-    print("Snake collide with the wall")
-    game_close = True
+    # Check snake head collition
+    for x in self.snake_list[:-1]:
+      if x == snake_head:
+        self.game_close = True
 
-  # Update the position of the snake
-  x1 += x1_change
-  y1 += y1_change
+    # Create the snake
+    self.snake(self.snake_list)
 
-  # Fill the display with white background
-  display.fill(white)
+    # Update the screen
+    pygame.display.update()
 
-  # Draw food in the screen
-  pygame.draw.rect(display, green, [int(foodx), int(foody), food_block_size, food_block_size])
+    # Collide with food
+    # Checking the head is coliding with any part of the food
+    if (abs(self.x1 - self.foodx) >= (0) and abs(self.x1 - self.foodx) <= (self.food_block_size)) and \
+    (abs(self.y1 - self.foody) >= (0) and abs(self.y1 - self.foody) <= (self.food_block_size)):
+      print("Collide with food!!!")
+      self.foodx = round(random.randrange(0, self.display_width - self.snake_block_size) / 10.0) * 10.0
+      self.foody = round(random.randrange(0, self.display_height - self.snake_block_size) / 10.0) * 10.0
+      self.snake_length += 1
+      self.score += 1
 
-  # Draw snake in the screen
-  snake_head = []
-  snake_head.append(x1)
-  snake_head.append(y1)
-  snake_list.append(snake_head)
-  if len(snake_list) > snake_length:
-    del snake_list[0]
+    # Update screen in every 'some' seconds [Define as snake speed]
+    self.clock.tick(self.snake_speed)
 
-  # Check snake head collition
-  for x in snake_list[:-1]:
-    if x == snake_head:
-      game_close = True
+    # Printing
+    print("Snake X: {:.2f} | Y: {:.2f}, Food X: {:.2f} | Y: {:.2f}".format(self.x1, self.y1, self.foodx, self.foody))
+    print("Score: " + str(self.score))
 
-  # Create the snake
-  snake(snake_list)
+  def close(self):
+    self.display.fill(self.white)
+    self.message("Score: " + str(self.score), self.red)
+    self.message("Game Over! (Q) - Quit or (P) - Play Again", self.red, top_placement=100)
 
-  # Update the screen
-  pygame.display.update()
+    # Update the current screen
+    pygame.display.update()
 
-  # Collide with food
-  # Checking the head is coliding with any part of the food
-  if (abs(x1 - foodx) >= (0) and abs(x1 - foodx) <= (food_block_size)) and \
-  (abs(y1 - foody) >= (0) and abs(y1 - foody) <= (food_block_size)):
-    print("Collide with food!!!")
-    foodx = round(random.randrange(0, display_width - snake_block_size) / 10.0) * 10.0
-    foody = round(random.randrange(0, display_height - snake_block_size) / 10.0) * 10.0
-    snake_length += 1
-    score += 1
+    for event in pygame.event.get():
+      if event.type == pygame.QUIT:
+        self.game_over = True
+        self.should_quit = True
+        self.game_close = False
+      if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_q:
+          self.game_over = True
+          self.game_close = False
+        if event.key == pygame.K_p:
+          self.reset()
+          self.main()
 
-  # Update screen in every 'some' seconds [Define as snake speed]
-  clock.tick(snake_speed)
+  # Public
+  def get_snake_position(self):
+    return { "X": self.x1, "Y": self.y1 }
 
-  print("Snake X: {:.2f} | Y: {:.2f}, Food X: {:.2f} | Y: {:.2f}".format(x1, y1, foodx, foody))
-  print("Score: " + str(score))
+  def setup_display(self):
+    pygame.display.update()
+    pygame.display.set_caption('Snake')
 
-def close():
-  global game_close, game_over, should_quit, score
+  def main(self):
+    # Main game loop
+    while not self.game_over:
+      # Close loop
+      while self.game_close == True:
+        self.close()
+      self.loop()
 
-  display.fill(white)
-  message("Score: " + str(score), red)
-  message("Game Over! Press (Q) - Quit or (P) - Play Again", red, top_placement=100)
+    # Trigger direct quit
+    if self.should_quit == True:
+      print("Quit!!!")
+      self.quit()
 
-  # Update the current screen
-  pygame.display.update()
+    # Fill screen
+    self.display.fill(self.white)
 
-  for event in pygame.event.get():
-    if event.type == pygame.QUIT:
-      game_over = True
-      should_quit = True
-      game_close = False
-    if event.type == pygame.KEYDOWN:
-      if event.key == pygame.K_q:
-        game_over = True
-        game_close = False
-      if event.key == pygame.K_p:
-        reset()
-        main()
+    # 'Game Over' screen
+    self.message("Finish", self.red)
 
-def main():
-  global should_quit, game_over, game_close, game_quit_screen_wait, display
+    # Update the screen
+    pygame.display.update()
 
-  # Main game loop
-  while not game_over:
-    # Close loop
-    while game_close == True:
-      close()
-    loop()
+    # Wait for some time
+    time.sleep(self.game_quit_screen_wait)
 
-  # Trigger direct quit
-  if should_quit == True:
-    print("Quit!!!")
-    quit()
-
-  # Fill screen
-  display.fill(white)
-
-  # 'Game Over' screen
-  message("Finish", red)
-
-  # Update the screen
-  pygame.display.update()
-
-  # Wait for some time
-  time.sleep(game_quit_screen_wait)
-
-  # Quit game
-  quit()
+    # Quit game
+    self.quit()
 
 if __name__ == '__main__':
-  main()
+  game = Game()
+  game.setup_display()
+  game.main()
+
+  for i in range(10000000):
+    print(game.get_snake_position())
